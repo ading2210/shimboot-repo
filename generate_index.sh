@@ -19,7 +19,17 @@ for web_dir in $website_dirs; do
   fi
 
   rel_path="/$(realpath --relative-to="${website_base}" "$web_dir")/"
-  ls_out="$(ls -l $web_dir)"
+  ls_out="$(ls -l $web_dir | tail -n +2)"
+  
+  index=""
+  while IFS= read -r line; do
+    filename="$(echo "$line" | rev | cut -d' ' -f1 | rev)"
+    prefix="$(echo "$line" | rev | cut -d' ' -f2- | rev)"
+    link="<a href='./$filename'>$filename</a>"
+    index="$index
+$prefix $link"
+  done <<< "$ls_out"
+
   echo "<!DOCTYPE html>
     <html>
       <head>
@@ -28,7 +38,7 @@ for web_dir in $website_dirs; do
       <body>
         <h1>Index of $rel_path</h1>
         <hr>
-        <pre>$ls_out</pre>
+        <pre>$index</pre>
         <hr>
       </body>
     </html>
