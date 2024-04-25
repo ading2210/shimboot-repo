@@ -6,27 +6,22 @@ if [ "$DEBUG" ]; then
 fi
 
 print_help() {
-  echo "Usage: ./build_mesa.sh release_name [arch]"
-  echo "release_name should be either 'bookworm' or 'unstable'"
+  echo "Usage: ./build_mesa.sh [arch]"
 }
 
-if [ -z "$1" ]; then
-  print_help
-  exit 1
-fi
-
 if [ "$EUID" -ne 0 ]; then 
+  print_help
   echo "This script must be run as root."
   exit 1
 fi
 
-if [ "$2" ]; then
-  arch="$2"
+if [ "$1" ]; then
+  arch="$1"
 else
   arch="amd64"
 fi
 
-release_name="$1"
+release_name="bookworm"
 base_path="$(realpath $(dirname $0))"
 tmp_dir="/tmp/chromeos-systemd"
 qemu_dir="$base_path/qemu"

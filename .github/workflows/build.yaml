@@ -1,0 +1,103 @@
+on: [push]
+
+jobs:
+  build_systemd:
+    strategy: 
+      matrix:
+        release_name: [bookworm, unstable]
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install deps
+        run: | #upgrade the actions container to 24.04 because 22.04 doesn't have some of the deps
+          sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
+          sudo apt-get update
+          sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
+
+      - name: Build
+        run: | 
+          sudo ./build_systemd.sh ${{ matrix.release_name }}
+          mkdir -p out
+          cp build/*.deb out
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: systemd_${{ matrix.release_name }}
+          path: out
+  
+  build_mesa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install deps
+        run: | 
+          sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dpkg-dev dh-package-notes
+
+      - name: Build
+        run: | 
+          sudo ./build_mesa.sh
+          mkdir -p out
+          cp build/*.deb out
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mesa_generic
+          path: out
+  
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    needs: [build_systemd, build_mesa]
+    steps:
+      - name: Install deps
+        run: |
+          sudo apt-get install -y dpkg-scanpackages
+
+      - name: Setup directories 
+        run: |
+          mkdir -p repo
+          mkdir -p download
+
+      - name: Download systemd for bookworm
+        uses: actions/download-artifact@v4
+        with:
+          name: systemd_bookworm
+          path: download/systemd_bookworm
+
+      - name: Download systemd for unstable
+        uses: actions/download-artifact@v4
+        with:
+          name: systemd_unstable
+          path: download/systemd_unstable
+
+      - name: Download mesa for all releases
+        uses: actions/download-artifact@v4
+        with:
+          name: mesa_generic
+          path: download/mesa_generic
+      
+      - name: debug with ssh
+        uses: mxschmitt/action-tmate@v3
+      
+      - name: Build repo
+        run: |
+          ./build_repo.sh
+          mkdir -p website
+          mv repo/ website/debian/
+      
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: b8079ffa92c97010f2a8d759e24cc782
+          projectName: shimboot
+          directory: website
