@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deps
         run: | #upgrade the actions container to 24.04 because 22.04 doesn't have some of the deps
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deps
         run: | 
@@ -58,9 +58,12 @@ jobs:
       deployments: write
     needs: [build_systemd, build_mesa]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Install deps
         run: |
-          sudo apt-get install -y dpkg-scanpackages
+          sudo apt-get install -y dpkg-dev
 
       - name: Setup directories 
         run: |
@@ -85,14 +88,12 @@ jobs:
           name: mesa_generic
           path: download/mesa_generic
       
-      - name: debug with ssh
-        uses: mxschmitt/action-tmate@v3
-      
       - name: Build repo
         run: |
           ./build_repo.sh
           mkdir -p website
           mv repo/ website/debian/
+          ./generate_index.sh
       
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
