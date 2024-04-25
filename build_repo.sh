@@ -24,6 +24,7 @@ for release_name in $supported_releases; do
   mkdir -p $pool_dir
   cp $download_dir/systemd_$release_name/*.deb $pool_dir
   cp $download_dir/mesa_generic/*.deb $pool_dir
+  rm $pool_dir/*dbgsym*
 
   cd $repo_dir
   dpkg-scanpackages --arch amd64 pool/main/$release_name > $dists_dir/Packages
