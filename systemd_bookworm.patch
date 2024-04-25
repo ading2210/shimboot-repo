@@ -1,0 +1,29 @@
+diff --git a/src/shared/mount-util.c b/src/shared/mount-util.c
+index dd3fd7919b..6fc589b3d3 100644
+--- a/src/shared/mount-util.c
++++ b/src/shared/mount-util.c
+@@ -67,23 +67,7 @@ int mount_nofollow(
+                 const char *filesystemtype,
+                 unsigned long mountflags,
+                 const void *data) {
+-
+-        _cleanup_close_ int fd = -1;
+-
+-        /* In almost all cases we want to manipulate the mount table without following symlinks, hence
+-         * mount_nofollow() is usually the way to go. The only exceptions are environments where /proc/ is
+-         * not available yet, since we need /proc/self/fd/ for this logic to work. i.e. during the early
+-         * initialization of namespacing/container stuff where /proc is not yet mounted (and maybe even the
+-         * fs to mount) we can only use traditional mount() directly.
+-         *
+-         * Note that this disables following only for the final component of the target, i.e symlinks within
+-         * the path of the target are honoured, as are symlinks in the source path everywhere. */
+-
+-        fd = open(target, O_PATH|O_CLOEXEC|O_NOFOLLOW);
+-        if (fd < 0)
+-                return -errno;
+-
+-        return mount_fd(source, fd, filesystemtype, mountflags, data);
++        return RET_NERRNO(mount(source, target, filesystemtype, mountflags, data));
+ }
+ 
+ int umount_recursive(const char *prefix, int flags) {
