@@ -19,7 +19,7 @@ jobs:
         run: | #upgrade the actions container to 24.04 because 22.04 doesn't have some of the deps
           sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
           sudo apt-get update
-          sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
+          sudo apt-get install -y sbuild-qemu qemu-user-static qemu-system quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
 
       - name: Build
         run: | 
@@ -45,7 +45,9 @@ jobs:
 
       - name: Install deps
         run: | 
-          sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dpkg-dev dh-package-notes
+          sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
+          sudo apt-get update
+          sudo apt-get install -y sbuild-qemu qemu-user-static qemu-system quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
 
       - name: Build
         run: | 
