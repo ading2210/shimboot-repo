@@ -8,6 +8,7 @@ jobs:
     strategy: 
       matrix:
         release_name: [bookworm, unstable]
+        arch: [amd64, arm64]
 
     runs-on: ubuntu-latest
     steps:
@@ -22,17 +23,21 @@ jobs:
 
       - name: Build
         run: | 
-          sudo ./build_systemd.sh ${{ matrix.release_name }}
+          sudo ./build_systemd.sh ${{ matrix.release_name }} ${{ matrix.arch }}
           mkdir -p out
           cp build/*.deb out
       
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: systemd_${{ matrix.release_name }}
+          name: systemd_${{ matrix.release_name }}_${{ matrix.arch }}
           path: out
   
   build_mesa:
+    strategy: 
+      matrix:
+        arch: [amd64, arm64]
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -44,14 +49,14 @@ jobs:
 
       - name: Build
         run: | 
-          sudo ./build_mesa.sh
+          sudo ./build_mesa.sh ${{ matrix.arch }}
           mkdir -p out
           cp build/*.deb out
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mesa_generic
+          name: mesa_generic_${{ matrix.arch }}
           path: out
   
   publish:
@@ -73,23 +78,10 @@ jobs:
           mkdir -p repo
           mkdir -p download
 
-      - name: Download systemd for bookworm
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: systemd_bookworm
-          path: download/systemd_bookworm
-
-      - name: Download systemd for unstable
-        uses: actions/download-artifact@v4
-        with:
-          name: systemd_unstable
-          path: download/systemd_unstable
-
-      - name: Download mesa for all releases
-        uses: actions/download-artifact@v4
-        with:
-          name: mesa_generic
-          path: download/mesa_generic
+          path: download/
       
       - name: Build repo
         run: |
