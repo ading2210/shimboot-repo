@@ -2,8 +2,6 @@
 
 This repo contains scripts for building the Shimboot Debian repositories, which include a patched version of systemd and mesa-amber.
 
-The scripts run on Github actions on a weekly schedule, and the resulting packages are automatically deployed to Cloudflare pages.
-
 ## Copyright:
 The contents of this repository are licensed under the GNU GPL v3.
 
