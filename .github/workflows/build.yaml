@@ -21,6 +21,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y sbuild-qemu qemu-user-static qemu-system quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
 
+      - name: debug with ssh
+        uses: mxschmitt/action-tmate@v3
+
       - name: Build
         run: | 
           sudo ./build_systemd.sh ${{ matrix.release_name }} ${{ matrix.arch }}
@@ -48,6 +51,9 @@ jobs:
           sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
           sudo apt-get update
           sudo apt-get install -y sbuild-qemu qemu-user-static qemu-system quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
+
+      - name: debug with ssh
+        uses: mxschmitt/action-tmate@v3
 
       - name: Build
         run: | 
