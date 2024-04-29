@@ -8,7 +8,6 @@ jobs:
     strategy: 
       matrix:
         release_name: [bookworm, unstable]
-        arch: [amd64, arm64]
 
     runs-on: ubuntu-latest
     steps:
@@ -19,25 +18,21 @@ jobs:
         run: | #upgrade the actions container to 24.04 because 22.04 doesn't have some of the deps
           sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
           sudo apt-get update
-          sudo apt-get install -y sbuild-qemu qemu-user-static qemu-system quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
+          sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
 
       - name: Build
         run: | 
-          sudo ./build_systemd.sh ${{ matrix.release_name }} ${{ matrix.arch }}
+          sudo ./build_systemd.sh ${{ matrix.release_name }}
           mkdir -p out
           cp build/*.deb out
       
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: systemd_${{ matrix.release_name }}_${{ matrix.arch }}
+          name: systemd_${{ matrix.release_name }}
           path: out
   
   build_mesa:
-    strategy: 
-      matrix:
-        arch: [amd64, arm64]
-
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,20 +40,18 @@ jobs:
 
       - name: Install deps
         run: | 
-          sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
-          sudo apt-get update
-          sudo apt-get install -y sbuild-qemu qemu-user-static qemu-system quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
+          sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dpkg-dev dh-package-notes
 
       - name: Build
         run: | 
-          sudo ./build_mesa.sh ${{ matrix.arch }}
+          sudo ./build_mesa.sh
           mkdir -p out
           cp build/*.deb out
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mesa_generic_${{ matrix.arch }}
+          name: mesa_generic
           path: out
   
   publish:
@@ -80,10 +73,23 @@ jobs:
           mkdir -p repo
           mkdir -p download
 
-      - name: Download all artifacts
+      - name: Download systemd for bookworm
         uses: actions/download-artifact@v4
         with:
-          path: download/
+          name: systemd_bookworm
+          path: download/systemd_bookworm
+
+      - name: Download systemd for unstable
+        uses: actions/download-artifact@v4
+        with:
+          name: systemd_unstable
+          path: download/systemd_unstable
+
+      - name: Download mesa for all releases
+        uses: actions/download-artifact@v4
+        with:
+          name: mesa_generic
+          path: download/mesa_generic
       
       - name: Build repo
         run: |
