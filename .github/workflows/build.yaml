@@ -9,18 +9,16 @@ jobs:
       matrix:
         release_name: [bookworm, unstable]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install deps
-        run: | #upgrade the actions container to 24.04 because 22.04 doesn't have some of the deps
-          sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
-          sudo apt-get update
+        run: |
           sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
           wget "http://ftp.us.debian.org/debian/pool/main/p/package-notes/dh-dlopenlibdeps_0.11_all.deb" -O /tmp/dh-dlopenlibdeps_0.11_all.deb
-          sudo dpkg -i /tmp/dh-dlopenlibdeps_0.11_all.deb
+          sudo apt install /tmp/dh-dlopenlibdeps_0.11_all.deb
 
       - name: Build
         run: | 
@@ -35,7 +33,7 @@ jobs:
           path: out
   
   build_mesa:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,7 +55,7 @@ jobs:
           path: out
   
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       deployments: write
