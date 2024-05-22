@@ -19,6 +19,8 @@ jobs:
           sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
           sudo apt-get update
           sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
+          wget "http://ftp.us.debian.org/debian/pool/main/p/package-notes/dh-dlopenlibdeps_0.11_all.deb" -O /tmp/dh-dlopenlibdeps_0.11_all.deb
+          sudo dpkg -i /tmp/dh-dlopenlibdeps_0.11_all.deb
 
       - name: Build
         run: | 
