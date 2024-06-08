@@ -4,6 +4,8 @@ base_path="$(realpath $(dirname $0))"
 cd $base_path
 . ./common.sh
 
+#this script creates a chroot then invokes build_package_chroot.sh inside the chroot
+
 print_help() {
   echo "Usage: ./build_package.sh distro_name release_name arch"
   echo "Valid named arguments (specify with 'key=value'):"
@@ -28,7 +30,7 @@ else
 fi
 
 base_path="$(realpath $(dirname $0))"
-chroot_path="$base_path/chroots/${distro_name}_${release_name}_${arch}"
+chroot_path="$base_path/chroots/${distro_name}_${release_name}"
 
 #create the chroot if it doesn't exist
 if [ ! -d "$chroot_path" ]; then
