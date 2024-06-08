@@ -8,6 +8,7 @@ jobs:
     strategy: 
       matrix:
         release_name: [bookworm, unstable]
+        arch: [amd64, arm64]
 
     runs-on: ubuntu-24.04
     steps:
@@ -18,19 +19,16 @@ jobs:
         run: |
           sudo apt-get install -y debootstrap
 
-      - name: debug with ssh
-        uses: mxschmitt/action-tmate@v3
-
       - name: Build
         run: | 
-          sudo DEBUG=1 ./build_systemd.sh debian ${{ matrix.release_name }} amd64
-          mkdir -p out
-          cp build/*.deb out
+          sudo DEBUG=1 ./build_systemd.sh debian ${{ matrix.release_name }} ${{ matrix.arch }}
+          mkdir -p out/${{ matrix.release_name }}_${{ matrix.arch }}
+          cp build/*.deb out/${{ matrix.release_name }}_${{ matrix.arch }}
       
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: systemd_${{ matrix.release_name }}
+          name: systemd_${{ matrix.release_name }}_${{ matrix.arch }}
           path: out
   
   build_mesa:
@@ -43,14 +41,13 @@ jobs:
         run: | 
           sudo apt-get install -y debootstrap
 
-      - name: debug with ssh
-        uses: mxschmitt/action-tmate@v3
-
       - name: Build
         run: | 
           sudo ./build_mesa.sh debian bookworm amd64
-          mkdir -p out
-          cp build/*.deb out
+          mkdir -p out/bookworm_amd64
+          mkdir -p out/unstable_amd64
+          cp build/*.deb out/bookworm_amd64
+          cp build/*.deb out/unstable_amd64
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -77,24 +74,12 @@ jobs:
           mkdir -p repo
           mkdir -p download
 
-      - name: Download systemd for bookworm
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: systemd_bookworm
-          path: download/systemd_bookworm
+          path: download
+          merge-multiple: true
 
-      - name: Download systemd for unstable
-        uses: actions/download-artifact@v4
-        with:
-          name: systemd_unstable
-          path: download/systemd_unstable
-
-      - name: Download mesa for all releases
-        uses: actions/download-artifact@v4
-        with:
-          name: mesa_generic
-          path: download/mesa_generic
-      
       - name: Build repo
         run: |
           ./build_repo.sh

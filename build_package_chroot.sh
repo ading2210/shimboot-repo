@@ -78,7 +78,6 @@ fi
 #install build deps
 dpkg --add-architecture $arch
 apt-get update
-#(cd /; patch -p0 --forward --no-backup-if-mismatch -r -) < $base_path/fix_devscripts.patch
 mk-build-deps --host-arch $arch
 apt-get install -y ./*.deb
 if [ ! "$arch" = "$host_arch" ]; then

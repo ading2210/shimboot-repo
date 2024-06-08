@@ -33,9 +33,9 @@ base_path="$(realpath $(dirname $0))"
 chroot_path="$base_path/chroots/${distro_name}_${release_name}"
 
 #create the chroot if it doesn't exist
-if [ ! -d "$chroot_path" ]; then
+if [ ! -d "$chroot_path/opt/repo" ]; then
   mkdir -p $chroot_path
-  debootstrap --arch "$arch" "$release_name" "$chroot_path" "$repo_url"
+  debootstrap "$release_name" "$chroot_path" "$repo_url"
 fi
 
 #define the bind mount points
