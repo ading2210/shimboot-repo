@@ -1,5 +1,5 @@
 /build
 /qemu
 /out
+/chroots
 /website/debian
-/chroot
