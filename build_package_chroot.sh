@@ -80,15 +80,7 @@ dpkg --add-architecture $arch
 apt-get update
 mk-build-deps --host-arch $arch
 apt-get install -y ./*.deb
-if [ ! "$arch" = "$host_arch" ]; then
-  apt-get install crossbuild-essential-$arch
-fi
 
 #build the package
 export DEB_BUILD_OPTIONS=nocheck #skip tests
-if [ "$arch" = "$host_arch" ]; then
-  dpkg-buildpackage -b -rfakeroot -us -uc -a$arch
-else
-  export CONFIG_SITE="/etc/dpkg-cross/cross-config.$arch"
-  dpkg-buildpackage -b -rfakeroot -us -uc -a$arch -Pcross,nocheck
-fi
+dpkg-buildpackage -b -rfakeroot -us -uc -a$arch

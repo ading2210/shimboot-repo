@@ -17,8 +17,8 @@ jobs:
 
       - name: Install deps
         run: |
-          sudo apt-get install -y debootstrap
-
+          sudo apt-get install -y debootstrap binfmt-support qemu-user-static
+    
       - name: Build
         run: | 
           sudo DEBUG=1 ./build_systemd.sh debian ${{ matrix.release_name }} ${{ matrix.arch }}
