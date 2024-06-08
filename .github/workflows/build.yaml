@@ -16,13 +16,11 @@ jobs:
 
       - name: Install deps
         run: |
-          sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
-          wget "http://ftp.us.debian.org/debian/pool/main/p/package-notes/dh-dlopenlibdeps_0.11_all.deb" -O /tmp/dh-dlopenlibdeps_0.11_all.deb
-          sudo apt install /tmp/dh-dlopenlibdeps_0.11_all.deb
+          sudo apt-get install -y debootstrap
 
       - name: Build
         run: | 
-          sudo ./build_systemd.sh ${{ matrix.release_name }}
+          sudo DEBUG=1 ./build_systemd.sh debian ${{ matrix.release_name }} amd64
           mkdir -p out
           cp build/*.deb out
       
@@ -40,11 +38,11 @@ jobs:
 
       - name: Install deps
         run: | 
-          sudo apt-get install -y sbuild-qemu quilt build-essential fakeroot devscripts dh-make dpkg-dev dh-package-notes
+          sudo apt-get install -y debootstrap
 
       - name: Build
         run: | 
-          sudo ./build_mesa.sh
+          sudo ./build_mesa.sh debian bookworm amd64
           mkdir -p out
           cp build/*.deb out
       
