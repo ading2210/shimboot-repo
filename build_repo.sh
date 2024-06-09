@@ -17,7 +17,7 @@ rm -rf $repo_dir || true
 mkdir -p $repo_dir
 
 for release_name in $supported_releases; do
-  for $arch in $supported_arches; do
+  for arch in $supported_arches; do
     cd $base_path
 
     pool_dir="$repo_dir/pool/main/$release_name"
