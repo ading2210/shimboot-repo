@@ -86,7 +86,7 @@ jobs:
 
       - name: Build repo
         run: |
-          ./build_repo.sh
+          DEBUG=1 ./build_repo.sh
           mkdir -p website
           mv repo/ website/debian/
           ./generate_index.sh

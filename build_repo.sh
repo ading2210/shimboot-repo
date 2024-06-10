@@ -10,8 +10,10 @@ fi
 supported_releases="bookworm unstable"
 supported_arches="amd64 arm64"
 base_path="$(realpath $(pwd))"
-repo_dir="$base_path/repo/"
-download_dir="$base_path/download/"
+repo_dir="$base_path/repo"
+download_dir="$base_path/download"
+
+ls -R "$download_dir"
 
 rm -rf $repo_dir || true
 mkdir -p $repo_dir
