@@ -26,7 +26,7 @@ for release_name in $supported_releases; do
     dists_dir="$repo_dir/dists/$release_name/main/binary-$arch"
     mkdir -p $dists_dir
     mkdir -p $pool_dir
-    cp "$download_dir/${release_name}_${arch}/*".deb $pool_dir
+    cp "$download_dir/${release_name}_${arch}/"*.deb $pool_dir
     rm $pool_dir/*dbgsym*
 
     cd $repo_dir
