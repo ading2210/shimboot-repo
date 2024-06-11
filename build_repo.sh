@@ -8,24 +8,25 @@ if [ "$DEBUG" ]; then
 fi
 
 supported_releases="bookworm unstable"
-architecture="amd64 arm64"
+supported_arches="amd64 arm64"
 base_path="$(realpath $(pwd))"
 repo_dir="$base_path/repo"
 download_dir="$base_path/download"
+
+ls -R "$download_dir"
 
 rm -rf $repo_dir || true
 mkdir -p $repo_dir
 
 for release_name in $supported_releases; do
-  for arch in $architecture; do
+  for arch in $supported_arches; do
     cd $base_path
 
     pool_dir="$repo_dir/pool/main/$release_name"
     dists_dir="$repo_dir/dists/$release_name/main/binary-$arch"
     mkdir -p $dists_dir
     mkdir -p $pool_dir
-    cp "$download_dir/systemd_${release_name}_${arch}"/*.deb $pool_dir
-    cp "$download_dir/mesa_generic_${arch}"/*.deb $pool_dir
+    cp "$download_dir/${release_name}_${arch}/"*.deb $pool_dir
     rm $pool_dir/*dbgsym*
 
     cd $repo_dir

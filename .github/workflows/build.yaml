@@ -7,25 +7,20 @@ jobs:
         release_name: [bookworm, unstable]
         arch: [amd64, arm64]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install deps
-        run: | #upgrade the actions container to 24.04 because 22.04 doesn't have some of the deps
-          sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
-          sudo apt-get update
-          sudo apt-get install -y sbuild-qemu qemu-user-static qemu-system quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
-
-      - name: debug with ssh
-        uses: mxschmitt/action-tmate@v3
-
+        run: |
+          sudo apt-get install -y debootstrap binfmt-support qemu-user-static
+    
       - name: Build
         run: | 
-          sudo ./build_systemd.sh ${{ matrix.release_name }} ${{ matrix.arch }}
-          mkdir -p out
-          cp build/*.deb out
+          sudo DEBUG=1 ./build_systemd.sh debian ${{ matrix.release_name }} ${{ matrix.arch }}
+          mkdir -p out/${{ matrix.release_name }}_${{ matrix.arch }}
+          cp build/*.deb out/${{ matrix.release_name }}_${{ matrix.arch }}
       
       - name: Upload artifact
         uses: actions/upload-artifact@master
@@ -38,25 +33,22 @@ jobs:
       matrix:
         arch: [amd64, arm64]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install deps
         run: | 
-          sudo sed -i 's/jammy/noble/' /etc/apt/sources.list
-          sudo apt-get update
-          sudo apt-get install -y sbuild-qemu qemu-user-static qemu-system quilt build-essential fakeroot devscripts dh-make dh-nss dpkg-dev dh-package-notes
-
-      - name: debug with ssh
-        uses: mxschmitt/action-tmate@v3
+          sudo apt-get install -y debootstrap binfmt-support qemu-user-static
 
       - name: Build
         run: | 
-          sudo ./build_mesa.sh ${{ matrix.arch }}
-          mkdir -p out
-          cp build/*.deb out
+          sudo ./build_mesa.sh debian bookworm ${{ matrix.arch }}
+          mkdir -p out/bookworm_${{ matrix.arch }}
+          mkdir -p out/unstable_${{ matrix.arch }}
+          cp build/*.deb out/bookworm_${{ matrix.arch }}
+          cp build/*.deb out/unstable_${{ matrix.arch }}
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -65,7 +57,7 @@ jobs:
           path: out
   
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       deployments: write
@@ -83,14 +75,15 @@ jobs:
           mkdir -p repo
           mkdir -p download
 
-      - name: Download all artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: download/
-      
+          path: download
+          merge-multiple: true
+
       - name: Build repo
         run: |
-          ./build_repo.sh
+          DEBUG=1 ./build_repo.sh
           mkdir -p website
           mv repo/ website/debian/
           ./generate_index.sh
