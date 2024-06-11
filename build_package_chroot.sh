@@ -26,6 +26,7 @@ patches="${args['patches']}"
 
 build_dir="$base_path/build"
 source_dir="$build_dir/pkg"
+host_arch="$(dpkg --print-architecture)"
 
 if [ "$distro_name" = "debian" ]; then
   repo_url="http://deb.debian.org/debian"
@@ -35,6 +36,8 @@ else
 fi
 
 #install debian build tools
+apt-get update
+apt-get upgrade -y
 apt-get install git devscripts quilt -y
 
 #create a directory to put the package source in
@@ -47,7 +50,7 @@ if [ "$source_type" = "git" ]; then
   git clone --depth=1 "$pkg_source" "$source_dir"
 
 elif [ "$source_type" = "apt" ]; then
-  if ! grep -q "apt-src" "/etc/apt/sources.list"; then
+  if ! grep -q "deb-src" "/etc/apt/sources.list"; then
     echo "deb-src $repo_url $release_name main" >> /etc/apt/sources.list
   fi
 
@@ -73,7 +76,9 @@ if [ "$patches" ]; then
 fi
 
 #install build deps
-mk-build-deps
+dpkg --add-architecture $arch
+apt-get update
+mk-build-deps --host-arch $arch
 apt-get install -y ./*.deb
 
 #build the package

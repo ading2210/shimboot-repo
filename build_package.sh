@@ -4,6 +4,8 @@ base_path="$(realpath $(dirname $0))"
 cd $base_path
 . ./common.sh
 
+#this script creates a chroot then invokes build_package_chroot.sh inside the chroot
+
 print_help() {
   echo "Usage: ./build_package.sh distro_name release_name arch"
   echo "Valid named arguments (specify with 'key=value'):"
@@ -31,9 +33,9 @@ base_path="$(realpath $(dirname $0))"
 chroot_path="$base_path/chroots/${distro_name}_${release_name}_${arch}"
 
 #create the chroot if it doesn't exist
-if [ ! -d "$chroot_path" ]; then
+if [ ! -d "$chroot_path/opt/repo" ]; then
   mkdir -p $chroot_path
-  debootstrap --arch "$arch" "$release_name" "$chroot_path" "$repo_url"
+  debootstrap --arch $arch "$release_name" "$chroot_path" "$repo_url"
 fi
 
 #define the bind mount points

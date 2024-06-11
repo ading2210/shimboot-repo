@@ -5,6 +5,7 @@ jobs:
     strategy: 
       matrix:
         release_name: [bookworm, unstable]
+        arch: [amd64, arm64]
 
     runs-on: ubuntu-24.04
     steps:
@@ -13,24 +14,25 @@ jobs:
 
       - name: Install deps
         run: |
-          sudo apt-get install -y debootstrap
-
-      - name: debug with ssh
-        uses: mxschmitt/action-tmate@v3
-
+          sudo apt-get install -y debootstrap binfmt-support qemu-user-static
+    
       - name: Build
         run: | 
-          sudo DEBUG=1 ./build_systemd.sh debian ${{ matrix.release_name }} amd64
-          mkdir -p out
-          cp build/*.deb out
+          sudo DEBUG=1 ./build_systemd.sh debian ${{ matrix.release_name }} ${{ matrix.arch }}
+          mkdir -p out/${{ matrix.release_name }}_${{ matrix.arch }}
+          cp build/*.deb out/${{ matrix.release_name }}_${{ matrix.arch }}
       
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: systemd_${{ matrix.release_name }}
+          name: systemd_${{ matrix.release_name }}_${{ matrix.arch }}
           path: out
   
   build_mesa:
+    strategy: 
+      matrix:
+        arch: [amd64, arm64]
+
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -38,21 +40,20 @@ jobs:
 
       - name: Install deps
         run: | 
-          sudo apt-get install -y debootstrap
-
-      - name: debug with ssh
-        uses: mxschmitt/action-tmate@v3
+          sudo apt-get install -y debootstrap binfmt-support qemu-user-static
 
       - name: Build
         run: | 
-          sudo ./build_mesa.sh debian bookworm amd64
-          mkdir -p out
-          cp build/*.deb out
+          sudo ./build_mesa.sh debian bookworm ${{ matrix.arch }}
+          mkdir -p out/bookworm_${{ matrix.arch }}
+          mkdir -p out/unstable_${{ matrix.arch }}
+          cp build/*.deb out/bookworm_${{ matrix.arch }}
+          cp build/*.deb out/unstable_${{ matrix.arch }}
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mesa_generic
+          name: mesa_generic_${{ matrix.arch }}
           path: out
   
   publish:
@@ -74,27 +75,15 @@ jobs:
           mkdir -p repo
           mkdir -p download
 
-      - name: Download systemd for bookworm
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: systemd_bookworm
-          path: download/systemd_bookworm
+          path: download
+          merge-multiple: true
 
-      - name: Download systemd for unstable
-        uses: actions/download-artifact@v4
-        with:
-          name: systemd_unstable
-          path: download/systemd_unstable
-
-      - name: Download mesa for all releases
-        uses: actions/download-artifact@v4
-        with:
-          name: mesa_generic
-          path: download/mesa_generic
-      
       - name: Build repo
         run: |
-          ./build_repo.sh
+          DEBUG=1 ./build_repo.sh
           mkdir -p website
           mv repo/ website/debian/
           ./generate_index.sh
