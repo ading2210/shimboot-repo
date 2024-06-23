@@ -34,6 +34,10 @@ repo_components="$(get_distro_info "$distro_name" "$arch" | cut -d'|' -f2)"
 rm -f /etc/apt/sources.list
 echo "deb $repo_url $release_name $repo_components" >> /etc/apt/sources.list
 echo "deb-src $repo_url $release_name $repo_components" >> /etc/apt/sources.list
+if [ "$distro_name" = "ubuntu" ]; then
+  echo "deb $repo_url $release_name-updates $repo_components" >> /etc/apt/sources.list
+  echo "deb-src $repo_url $release_name-updates $repo_components" >> /etc/apt/sources.list
+fi
 
 #install debian build tools
 apt-get update
