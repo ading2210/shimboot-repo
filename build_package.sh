@@ -21,13 +21,7 @@ assert_args "$3"
 distro_name="$1"
 release_name="$2"
 arch="$3"
-
-if [ "$distro_name" = "debian" ]; then
-  repo_url="http://deb.debian.org/debian"
-else
-  echo "invalid distro name"
-  exit 1
-fi
+repo_url="$(get_distro_info "$distro_name" | cut -d'|' -f1)"
 
 base_path="$(realpath $(dirname $0))"
 chroot_path="$base_path/chroots/${distro_name}_${release_name}_${arch}"
@@ -59,4 +53,6 @@ mkdir -p "$repo_path"
 mount --bind "$base_path" "$repo_path"
 
 #run the chroot
+rm -f "$chroot_path/etc/resolv.conf"
+cp /etc/resolv.conf "$chroot_path/etc/resolv.conf"
 LC_ALL=C chroot "$chroot_path" /usr/bin/env IN_CHROOT=1 DEBUG=$DEBUG /opt/repo/build_package_chroot.sh "$@"

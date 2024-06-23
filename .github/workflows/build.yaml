@@ -4,7 +4,7 @@ jobs:
   build_systemd:
     strategy: 
       matrix:
-        release_name: [bookworm, unstable]
+        release_name: [ubuntu:jammy, debian:bookworm, debian:unstable]
         arch: [amd64, arm64]
 
     runs-on: ubuntu-24.04
@@ -18,9 +18,11 @@ jobs:
     
       - name: Build
         run: | 
-          sudo DEBUG=1 ./build_systemd.sh debian ${{ matrix.release_name }} ${{ matrix.arch }}
-          mkdir -p out/${{ matrix.release_name }}_${{ matrix.arch }}
-          cp build/*.deb out/${{ matrix.release_name }}_${{ matrix.arch }}
+          distro="$(echo ${{ matrix.release_name }} | cut -d':' -f1)"
+          release="$(echo ${{ matrix.release_name }} | cut -d':' -f2)"
+          sudo DEBUG=1 ./build_systemd.sh $distro $release ${{ matrix.arch }}
+          mkdir -p out/${release}_${{ matrix.arch }}
+          cp build/*.deb out/${release}_${{ matrix.arch }}
       
       - name: Upload artifact
         uses: actions/upload-artifact@master
@@ -45,8 +47,10 @@ jobs:
       - name: Build
         run: | 
           sudo ./build_mesa.sh debian bookworm ${{ matrix.arch }}
+          mkdir -p out/jammy_${{ matrix.arch }}
           mkdir -p out/bookworm_${{ matrix.arch }}
           mkdir -p out/unstable_${{ matrix.arch }}
+          cp build/*.deb out/jammy_${{ matrix.arch }}
           cp build/*.deb out/bookworm_${{ matrix.arch }}
           cp build/*.deb out/unstable_${{ matrix.arch }}
       

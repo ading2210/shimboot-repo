@@ -54,3 +54,21 @@ assert_args() {
     exit 1
   fi
 }
+
+get_distro_info() {
+  local distro_name="$1"
+  if [ "$distro_name" = "debian" ]; then
+    local repo_url="http://deb.debian.org/debian"
+    local components="main"
+
+  elif [ "$distro_name" = "ubuntu" ]; then
+    local repo_url="http://archive.ubuntu.com/ubuntu"
+    local components="main universe"
+
+  else
+    echo "invalid distro name"
+    exit 1
+  fi
+
+  echo "$repo_url|$components"
+}

@@ -19,4 +19,4 @@ arch="$3"
 ./build_package.sh $distro_name $release_name $arch \
   source_type=apt \
   pkg_source=systemd \
-  patches=systemd_$release_name.patch
+  patches=patches/systemd_$release_name.patch

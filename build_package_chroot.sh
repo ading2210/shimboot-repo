@@ -27,18 +27,18 @@ patches="${args['patches']}"
 build_dir="$base_path/build"
 source_dir="$build_dir/pkg"
 host_arch="$(dpkg --print-architecture)"
+repo_url="$(get_distro_info "$distro_name" | cut -d'|' -f1)"
+repo_components="$(get_distro_info "$distro_name" | cut -d'|' -f2)"
 
-if [ "$distro_name" = "debian" ]; then
-  repo_url="http://deb.debian.org/debian"
-else
-  echo "invalid distro name"
-  exit 1
-fi
+#setup apt repos
+rm -f /etc/apt/sources.list
+echo "deb $repo_url $release_name $repo_components" >> /etc/apt/sources.list
+echo "deb-src $repo_url $release_name $repo_components" >> /etc/apt/sources.list
 
 #install debian build tools
 apt-get update
 apt-get upgrade -y
-apt-get install git devscripts quilt -y
+apt-get install git devscripts quilt equivs -y
 
 #create a directory to put the package source in
 rm -rf "$build_dir"
@@ -50,10 +50,6 @@ if [ "$source_type" = "git" ]; then
   git clone --depth=1 "$pkg_source" "$source_dir"
 
 elif [ "$source_type" = "apt" ]; then
-  if ! grep -q "deb-src" "/etc/apt/sources.list"; then
-    echo "deb-src $repo_url $release_name main" >> /etc/apt/sources.list
-  fi
-
   echo "downloading source package"
   apt-get update
   apt-get source "$pkg_source"
