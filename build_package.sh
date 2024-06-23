@@ -21,7 +21,7 @@ assert_args "$3"
 distro_name="$1"
 release_name="$2"
 arch="$3"
-repo_url="$(get_distro_info "$distro_name" | cut -d'|' -f1)"
+repo_url="$(get_distro_info "$distro_name" "$arch" | cut -d'|' -f1)"
 
 base_path="$(realpath $(dirname $0))"
 chroot_path="$base_path/chroots/${distro_name}_${release_name}_${arch}"

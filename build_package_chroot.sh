@@ -27,8 +27,8 @@ patches="${args['patches']}"
 build_dir="$base_path/build"
 source_dir="$build_dir/pkg"
 host_arch="$(dpkg --print-architecture)"
-repo_url="$(get_distro_info "$distro_name" | cut -d'|' -f1)"
-repo_components="$(get_distro_info "$distro_name" | cut -d'|' -f2)"
+repo_url="$(get_distro_info "$distro_name" "$arch" | cut -d'|' -f1)"
+repo_components="$(get_distro_info "$distro_name" "$arch" | cut -d'|' -f2)"
 
 #setup apt repos
 rm -f /etc/apt/sources.list
