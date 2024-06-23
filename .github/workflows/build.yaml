@@ -1,10 +1,13 @@
-on: [push]
-
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * 0'
+    
 jobs:
   build_systemd:
     strategy: 
       matrix:
-        release_name: [ubuntu:jammy, debian:bookworm, debian:unstable]
+        release_name: ['ubuntu:jammy', 'debian:bookworm', 'debian:unstable']
         arch: [amd64, arm64]
 
     runs-on: ubuntu-24.04
