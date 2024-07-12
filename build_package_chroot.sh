@@ -75,6 +75,13 @@ if [ "$patches" ]; then
   quilt push
 fi
 
+#increment the package version
+export DEBEMAIL="allen@ading.dev"
+export DEBFULLNAME="Allen Ding"
+current_version="$(dpkg-parsechangelog --show-field Version)"
+new_version="$current_version-shimboot"
+dch -v "$new_version" --distribution "$release_name" "Build for shimboot repositories"
+
 #install build deps
 dpkg --add-architecture $arch
 apt-get update
