@@ -1,13 +1,13 @@
-Index: pkg/src/shared/mount-util.c
-===================================================================
---- pkg.orig/src/shared/mount-util.c
-+++ pkg/src/shared/mount-util.c
-@@ -65,23 +65,10 @@ int mount_nofollow(
+diff --git a/src/basic/mountpoint-util.c b/src/basic/mountpoint-util.c
+index 5af0896ad6..e6cf832f6e 100644
+--- a/src/basic/mountpoint-util.c
++++ b/src/basic/mountpoint-util.c
+@@ -620,23 +620,7 @@ int mount_nofollow(
                  const char *filesystemtype,
                  unsigned long mountflags,
                  const void *data) {
 -
--        _cleanup_close_ int fd = -1;
+-        _cleanup_close_ int fd = -EBADF;
 -
 -        /* In almost all cases we want to manipulate the mount table without following symlinks, hence
 -         * mount_nofollow() is usually the way to go. The only exceptions are environments where /proc/ is
@@ -23,10 +23,7 @@ Index: pkg/src/shared/mount-util.c
 -                return -errno;
 -
 -        return mount_fd(source, fd, filesystemtype, mountflags, data);
-+        int ret = mount(source, target, filesystemtype, mountflags, data);
-+        if (ret < 0)
-+                return -ret;
-+        return ret;
++        return RET_NERRNO(mount(source, target, filesystemtype, mountflags, data));
  }
  
- int umount_recursive(const char *prefix, int flags) {
+ const char *mount_propagation_flag_to_string(unsigned long flags) {

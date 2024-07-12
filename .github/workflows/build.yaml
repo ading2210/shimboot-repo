@@ -7,7 +7,7 @@ jobs:
   build_systemd:
     strategy: 
       matrix:
-        release_name: ['ubuntu_jammy', 'debian_bookworm', 'debian_unstable']
+        release_name: ['ubuntu_noble', 'debian_bookworm', 'debian_unstable']
         arch: [amd64, arm64]
 
     runs-on: ubuntu-24.04
@@ -55,10 +55,10 @@ jobs:
       - name: Build
         run: | 
           sudo ./build_mesa.sh debian bookworm ${{ matrix.arch }}
-          mkdir -p out/jammy_${{ matrix.arch }}
+          mkdir -p out/noble_${{ matrix.arch }}
           mkdir -p out/bookworm_${{ matrix.arch }}
           mkdir -p out/unstable_${{ matrix.arch }}
-          cp build/*.deb out/jammy_${{ matrix.arch }}
+          cp build/*.deb out/noble_${{ matrix.arch }}
           cp build/*.deb out/bookworm_${{ matrix.arch }}
           cp build/*.deb out/unstable_${{ matrix.arch }}
       
