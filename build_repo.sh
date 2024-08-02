@@ -22,6 +22,11 @@ for release_name in $supported_releases; do
   for arch in $supported_arches; do
     cd $base_path
 
+    if [ ! -d "$download_dir/${release_name}_${arch}/" ]; then
+      echo "skipping ${release_name} ${arch}, no packages found"
+      continue
+    fi
+
     pool_dir="$repo_dir/pool/main/$release_name"
     dists_dir="$repo_dir/dists/$release_name/main/binary-$arch"
     mkdir -p $dists_dir
