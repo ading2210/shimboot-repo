@@ -33,6 +33,7 @@ for release_name in $supported_releases; do
     mkdir -p $pool_dir
     cp "$download_dir/${release_name}_${arch}/"*.deb $pool_dir
     rm $pool_dir/*dbgsym*
+    rm $pool_dir/*udev*
 
     cd $repo_dir
     dpkg-scanpackages --arch $arch pool/main/$release_name > $dists_dir/Packages
