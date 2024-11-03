@@ -12,6 +12,8 @@ jobs:
         exclude:
           - release_name: debian_unstable
             arch: arm64
+          - release_name: ubuntu_noble
+            arch: arm64
 
     runs-on: ubuntu-24.04
     steps:
