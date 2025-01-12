@@ -112,3 +112,11 @@ jobs:
           accountId: b8079ffa92c97010f2a8d759e24cc782
           projectName: shimboot
           directory: website
+
+  workflow-keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: liskin/gh-workflow-keepalive@v1
