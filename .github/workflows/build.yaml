@@ -8,14 +8,9 @@ jobs:
     strategy: 
       matrix:
         release_name: ['ubuntu_noble', 'debian_bookworm', 'debian_unstable']
-        arch: [amd64, arm64]
-        exclude:
-          - release_name: debian_unstable
-            arch: arm64
-          - release_name: ubuntu_noble
-            arch: arm64
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
 
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,52 +20,51 @@ jobs:
           sudo apt-get update
           sudo apt-get upgrade -y
           sudo apt-get install -y debootstrap binfmt-support pcregrep
-          qemu_deb="$(curl "http://ftp.us.debian.org/debian/pool/main/q/qemu/" | pcregrep -o1 '<a href="(qemu-user-static_.+?amd64\.deb)">' | grep 'deb12' | tail -n1)"
-          wget "http://ftp.us.debian.org/debian/pool/main/q/qemu/$qemu_deb" -O /tmp/qemu-user-static.deb
-          sudo apt-get install /tmp/qemu-user-static.deb -y
     
       - name: Build
         run: | 
           distro="$(echo ${{ matrix.release_name }} | cut -d'_' -f1)"
           release="$(echo ${{ matrix.release_name }} | cut -d'_' -f2)"
-          sudo DEBUG=1 ./build_systemd.sh $distro $release ${{ matrix.arch }}
-          mkdir -p out/${release}_${{ matrix.arch }}
-          cp build/*.deb out/${release}_${{ matrix.arch }}
+          [ "$(uname -m)" = "x86_64" ] && arch="amd64" || arch="arm64"
+          sudo DEBUG=1 ./build_systemd.sh $distro $release $arch
+          mkdir -p out/${release}_${arch}
+          cp build/*.deb out/${release}_${arch}
       
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: systemd_${{ matrix.release_name }}_${{ matrix.arch }}
+          name: systemd_${{ matrix.release_name }}_${{ matrix.runner }}
           path: out
   
   build_mesa:
     strategy: 
       matrix:
-        arch: [amd64, arm64]
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
 
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install deps
         run: | 
-          sudo apt-get install -y debootstrap binfmt-support qemu-user-static
+          sudo apt-get install -y debootstrap binfmt-support
 
       - name: Build
         run: | 
-          sudo ./build_mesa.sh debian bookworm ${{ matrix.arch }}
-          mkdir -p out/noble_${{ matrix.arch }}
-          mkdir -p out/bookworm_${{ matrix.arch }}
-          mkdir -p out/unstable_${{ matrix.arch }}
-          cp build/*.deb out/noble_${{ matrix.arch }}
-          cp build/*.deb out/bookworm_${{ matrix.arch }}
-          cp build/*.deb out/unstable_${{ matrix.arch }}
+          [ "$(uname -m)" = "x86_64" ] && arch="amd64" || arch="arm64"
+          sudo ./build_mesa.sh debian bookworm $arch
+          mkdir -p out/noble_$arch
+          mkdir -p out/bookworm_$arch
+          mkdir -p out/unstable_$arch
+          cp build/*.deb out/noble_$arch
+          cp build/*.deb out/bookworm_$arch
+          cp build/*.deb out/unstable_$arch
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mesa_generic_${{ matrix.arch }}
+          name: mesa_generic_${{ matrix.runner }}
           path: out
   
   publish:
