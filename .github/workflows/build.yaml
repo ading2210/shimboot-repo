@@ -9,6 +9,9 @@ jobs:
       matrix:
         release_name: ['ubuntu_noble', 'ubuntu_jammy', 'debian_bookworm', 'debian_trixie', 'debian_unstable']
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
+        exclude:
+          - release_name: debian_unstable
+            runner: ubuntu-24.04-arm
 
     runs-on: ${{ matrix.runner }}
     steps:
