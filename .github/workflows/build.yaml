@@ -18,6 +18,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: remove snap
+        uses: ading2210/gh-actions-remove-snap@main
+
       - name: Install deps
         run: |
           sudo apt-get update
@@ -49,8 +52,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: remove snap
+        uses: ading2210/gh-actions-remove-snap@main
+
       - name: Install deps
         run: | 
+          sudo apt-get update
+          sudo apt-get upgrade -y
           sudo apt-get install -y debootstrap binfmt-support
 
       - name: Build
