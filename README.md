@@ -1,6 +1,17 @@
 # Shimboot Debian Repository
 
-This repo contains scripts for building the Shimboot Debian repositories, which include a patched version of systemd and mesa-amber.
+This repo contains scripts for building the Shimboot Debian repositories.
+
+The repo is located at https://shimboot.ading.dev/debian/, and contains the following packages:
+- systemd, with patches to make it run on Chrome OS kernels
+- mesa-amber
+
+It supports the following distros, with both arm64 and amd64 packages provided:
+- Debian 12 (Bookworm)
+- Debian 13 (Trixie)
+- Debian Sid (Sid)
+- Ubuntu 22.04 (Jammy)
+- Ubuntu 24.04 (Noble)
 
 ## Copyright:
 The contents of this repository are licensed under the GNU GPL v3.
