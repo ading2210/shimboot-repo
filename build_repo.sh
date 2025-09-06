@@ -7,7 +7,7 @@ if [ "$DEBUG" ]; then
   set -x
 fi
 
-supported_releases="bookworm trixie unstable noble"
+supported_releases="bookworm trixie unstable jammy noble"
 supported_arches="amd64 arm64"
 base_path="$(realpath $(pwd))"
 repo_dir="$base_path/repo"
