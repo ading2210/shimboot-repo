@@ -11,6 +11,7 @@ print_help() {
   echo "Valid named arguments (specify with 'key=value'):"
   echo "  source_type - Package source type (either git or apt)"
   echo "  pkg_source  - Package source location"
+  echo "  pkg_branch  - The package's git branch"
   echo "  patches     - Patch files (relative to the repo dir)"
 }
 

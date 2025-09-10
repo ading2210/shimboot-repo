@@ -9,6 +9,7 @@ print_help() {
   echo "Valid named arguments (specify with 'key=value'):"
   echo "  source_type - Package source type (either git or apt)"
   echo "  pkg_source  - Package source location"
+  echo "  pkg_branch  - The package's git branch"
   echo "  patches     - Patch files (relative to the repo dir)"
 }
 
@@ -22,6 +23,7 @@ arch="$3"
 
 source_type="${args['source_type']}"
 pkg_source="${args['pkg_source']}"
+pkg_branch="${args['pkg_branch']}"
 patches="${args['patches']}"
 
 build_dir="$base_path/build"
@@ -51,7 +53,11 @@ cd "$build_dir"
 
 #download the package source
 if [ "$source_type" = "git" ]; then
-  git clone --depth=1 "$pkg_source" "$source_dir"
+  if [ "$pkg_branch" ]; then
+    git clone --depth=1 "$pkg_source" "$source_dir" -b "$pkg_branch"
+  else
+    git clone --depth=1 "$pkg_source" "$source_dir"
+  fi
 
 elif [ "$source_type" = "apt" ]; then
   echo "downloading source package"
