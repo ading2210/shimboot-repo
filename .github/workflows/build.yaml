@@ -69,16 +69,16 @@ jobs:
           
           if [ "${{ matrix.branch }}" = "debian-unstable" ]; then
             mkdir -p out/unstable_$arch
+            mkdir -p out/trixie_$arch
+            cp build/*.deb out/trixie_$arch
             cp build/*.deb out/unstable_$arch
           else
             mkdir -p out/noble_$arch
             mkdir -p out/jammy_$arch
             mkdir -p out/bookworm_$arch
-            mkdir -p out/trixie_$arch
             cp build/*.deb out/noble_$arch
             cp build/*.deb out/jammy_$arch
             cp build/*.deb out/bookworm_$arch
-            cp build/*.deb out/trixie_$arch
           fi
           
       - name: Upload artifact
