@@ -41,6 +41,41 @@ jobs:
         with:
           name: systemd_${{ matrix.release_name }}_${{ matrix.runner }}
           path: out
+
+  build_croskbd:
+    strategy: 
+      matrix:
+        release_name: ['ubuntu_noble', 'ubuntu_jammy', 'debian_bookworm', 'debian_trixie', 'debian_unstable']
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: remove snap
+        uses: ading2210/gh-actions-remove-snap@main
+
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y debootstrap binfmt-support pcregrep
+    
+      - name: Build
+        run: | 
+          distro="$(echo ${{ matrix.release_name }} | cut -d'_' -f1)"
+          release="$(echo ${{ matrix.release_name }} | cut -d'_' -f2)"
+          [ "$(uname -m)" = "x86_64" ] && arch="amd64" || arch="arm64"
+          sudo DEBUG=1 ./build_croskbd.sh $distro $release $arch
+          mkdir -p out/${release}_${arch}
+          cp build/*.deb out/${release}_${arch}
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: croskbd_${{ matrix.release_name }}_${{ matrix.runner }}
+          path: out
   
   build_mesa:
     strategy: 
