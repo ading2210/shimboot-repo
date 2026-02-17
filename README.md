@@ -12,6 +12,7 @@ It supports the following distros, with both arm64 and amd64 packages provided:
 - Debian Sid (Sid)
 - Ubuntu 22.04 (Jammy)
 - Ubuntu 24.04 (Noble)
+- Ubuntu 26.04 (Resolute)
 
 ## Copyright:
 The contents of this repository are licensed under the GNU GPL v3.
