@@ -155,14 +155,13 @@ jobs:
           mkdir -p website
           mv repo/ website/debian/
           ./generate_index.sh
-      
+
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: b8079ffa92c97010f2a8d759e24cc782
-          projectName: shimboot
-          directory: website
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy website --project-name=shimboot
 
   workflow-keepalive:
     if: github.event_name == 'schedule'
