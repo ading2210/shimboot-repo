@@ -85,7 +85,7 @@ fi
 dpkg --add-architecture $arch
 apt-get update
 mk-build-deps --host-arch $arch
-apt-get install -y ./*.deb
+apt-get install -y --allow-downgrades ./*.deb
 
 #build the package
 export DEB_BUILD_OPTIONS=nocheck #skip tests
